@@ -5,5 +5,8 @@ edition = "2021"
 
 [dependencies]
 chrono = "0.4.39"
+fnv = "1.0.7"
 iced = { version = "0.13.1", features = ["advanced", "tokio"] }
 iced_layershell = "0.13.0"
+indexmap = "2.7.0"
+hyprland = { git = "https://github.com/hyprland-community/hyprland-rs", branch = "master" }

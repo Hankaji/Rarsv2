@@ -1,14 +1,20 @@
+use std::default;
+
 use iced::alignment::{Horizontal, Vertical};
 use iced::widget::{container, row, Container};
-use iced::{Color, Element, Length, Padding, Task as Command, Theme};
+use iced::{Color, Element, Length, Padding, Subscription, Task as Command, Theme};
 use iced_layershell::to_layer_message;
 use iced_layershell::Application;
-use modules::date_time::{self, DateTime};
+use modules::clock::{self, Clock};
+use modules::hyprland::{self, Hyprland};
 
 mod modules;
 
+#[derive(Default)]
 pub struct Bar {
-    center: DateTime,
+    start: Hyprland,
+    center: Clock,
+    // test: [BarModules],
 }
 
 // TODO: Implement later for directional bar
@@ -20,12 +26,11 @@ pub struct Bar {
 //     Bottom,
 // }
 
-// Because new iced delete the custom command, so now we make a macro crate to generate
-// the Command
 #[to_layer_message]
 #[derive(Debug, Clone)]
 pub enum Message {
-    DateTime(date_time::Message),
+    Clock(clock::Message),
+    Hyprland(hyprland::Message),
 }
 
 impl Application for Bar {
@@ -37,7 +42,8 @@ impl Application for Bar {
     fn new(_flags: ()) -> (Self, Command<Message>) {
         (
             Self {
-                center: DateTime::new(),
+                start: Hyprland::new(),
+                ..Default::default()
             },
             Command::none(),
         )
@@ -49,13 +55,19 @@ impl Application for Bar {
 
     fn subscription(&self) -> iced::Subscription<Self::Message> {
         // event::listen().map(Message::IcedEvent)
-        self.center.subscription().map(Message::DateTime)
+        // self.center.subscription().map(Message::Clock)
+        self.start.subscription().map(Message::Hyprland)
+        // Subscription::batch(subscriptions)
     }
 
     fn update(&mut self, msg: Message) -> Command<Message> {
         match msg {
-            Message::DateTime(msg) => {
+            Message::Clock(msg) => {
                 self.center.update(msg);
+                Command::none()
+            }
+            Message::Hyprland(msg) => {
+                self.start.update(msg);
                 Command::none()
             }
             _ => unimplemented!(),
@@ -63,16 +75,17 @@ impl Application for Bar {
     }
 
     fn view(&self) -> Element<Message> {
-        let date_time_module = self.center.view().map(Message::DateTime);
+        let hyprland_module = self.start.view().map(Message::Hyprland);
+        let clock_module = self.center.view().map(Message::Clock);
 
         // ------------------------- Container -------------------------
-        let left: Container<Message> = container("Left")
+        let left: Container<Message> = container(row![hyprland_module])
             .width(Length::Fill)
             .height(Length::Shrink)
             .align_left(Length::Fill)
             .align_y(Vertical::Center);
 
-        let center: Container<Message> = container(row![date_time_module])
+        let center: Container<Message> = container(row![clock_module])
             .width(Length::Fill)
             .height(Length::Shrink)
             .align_x(Horizontal::Center)
@@ -97,4 +110,10 @@ impl Application for Bar {
             text_color: theme.palette().text,
         }
     }
+}
+
+#[derive(Clone, Debug)]
+enum BarModules {
+    Clock,
+    Hyprland,
 }

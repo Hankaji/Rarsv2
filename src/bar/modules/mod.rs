@@ -1,2 +1,2 @@
-pub mod date_time;
+pub mod clock;
 pub mod hyprland;
