@@ -10,10 +10,9 @@ use iced::{
     color,
     futures::SinkExt,
     stream::channel,
-    widget::{container, row, text, Button, Space},
-    Border, Color, Element, Length, Subscription, Theme,
+    widget::{container, row},
+    Border, Color, Element, Subscription, Theme,
 };
-use iced_anim::AnimationBuilder;
 use indexmap::IndexMap;
 
 use crate::config::CONFIG;
