@@ -27,7 +27,7 @@ pub struct Hyprland {
 
 #[derive(Clone, Debug)]
 pub enum Message {
-    WorkspaceChange(String, WorkspaceState),
+    WorkspaceChanged,
 }
 
 // fn hyprland_listen() -> impl iced::futures::Stream<Item = Message> {
@@ -85,59 +85,46 @@ impl Hyprland {
     pub fn subscription(&self) -> Subscription<Message> {
         Subscription::run(|| {
             channel(1, |output| async move {
-                use hyprland::{async_closure, event_listener::AsyncEventListener};
+                use hyprland::event_listener::AsyncEventListener;
 
                 let arc_output = Arc::new(iced::futures::lock::Mutex::new(output));
 
                 let mut hyprland_ev_listener = AsyncEventListener::new();
+
                 let output = arc_output.clone();
                 hyprland_ev_listener.add_workspace_changed_handler({
                     move |_data| {
                         let output = output.clone();
                         Box::pin(async move {
-                            {
-                                // println!(
-                                //     "Workspace changed: {:?}",
-                                //     Workspaces::get().unwrap().to_vec()
-                                // );
-                                let mut output = output.lock().await;
+                            let mut output = output.lock().await;
 
-                                // TODO: Safe guard the error
-                                let active_wp = Workspace::get_active()
-                                    .expect("Could not find active workspace");
-
-                                let _ = output
-                                    .send(Message::WorkspaceChange(
-                                        active_wp.name,
-                                        WorkspaceState::Occupied,
-                                    ))
-                                    .await;
-                            }
+                            let _ = output.send(Message::WorkspaceChanged).await;
                         })
                     }
                 });
 
-                hyprland_ev_listener.add_window_moved_handler(async_closure! {
-                    |data| println!("Window moved: {data:?}")
+                let output = arc_output.clone();
+                hyprland_ev_listener.add_window_moved_handler({
+                    move |_| {
+                        let output = output.clone();
+                        Box::pin(async move {
+                            let mut output = output.lock().await;
+
+                            let _ = output.send(Message::WorkspaceChanged).await;
+                        })
+                    }
                 });
 
                 if let Err(e) = hyprland_ev_listener.start_listener_async().await {
                     eprintln!("{e}")
                 }
-
-                // let _ = output
-                //     .send(Message::WorkspaceChange(
-                //         "1".to_string(),
-                //         WorkspaceState::Occupied,
-                //     ))
-                //     .await;
             })
         })
     }
 
     pub fn update(&mut self, msg: Message) {
         match msg {
-            Message::WorkspaceChange(wp_id, state) => self.check_workspaces(),
+            Message::WorkspaceChanged => self.check_workspaces(),
         }
     }
 
@@ -159,6 +146,11 @@ impl Hyprland {
     }
 
     // ------------------------- Hyprland methods -------------------------
+    /// Check the current state of workspaces and renew the workspaces vector inside this struct
+    /// Implemetation seem pretty inefficient, however since the size is small enough (hopefully
+    /// ~10) the performance can be pretty much neglectable
+    ///
+    /// Will re-implement this algo if performance is a problem
     fn check_workspaces(&mut self) {
         let mut occupied_workspaces = Workspaces::get().expect("Cant get workspaces").to_vec();
         let active_workspace = Workspace::get_active().expect("Cant get active workspace");
