@@ -1,11 +1,12 @@
 use bar::Bar;
-use iced_layershell::reexport::Anchor;
+use iced_layershell::reexport::{Anchor, Layer};
 use iced_layershell::settings::{LayerShellSettings, Settings, StartMode};
 use iced_layershell::Application;
 
 mod bar;
 mod config;
 
+// fn main() -> iced::Result {
 fn main() -> Result<(), iced_layershell::Error> {
     let args: Vec<String> = std::env::args().collect();
 
@@ -37,6 +38,7 @@ fn main() -> Result<(), iced_layershell::Error> {
             exclusive_zone: 20,
             anchor,
             start_mode,
+            layer: Layer::Top,
             ..Default::default()
         },
         ..Default::default()

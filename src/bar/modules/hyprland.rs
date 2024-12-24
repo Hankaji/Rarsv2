@@ -1,22 +1,22 @@
-use std::{borrow::Borrow, cell::RefCell, sync::Arc, thread::sleep, time::Duration};
+use std::sync::Arc;
 
 use fnv::FnvBuildHasher;
 use hyprland::{
-    ctl::output,
     data::{Workspace, Workspaces},
-    event_listener::EventListener,
     shared::{HyprData, HyprDataActive, HyprDataVec},
 };
 use iced::{
-    advanced::text::Editor,
     alignment::Vertical,
     color,
     futures::SinkExt,
     stream::channel,
-    widget::{button, row, text, Button},
-    Element, Subscription,
+    widget::{container, row, text, Button, Space},
+    Border, Color, Element, Length, Subscription, Theme,
 };
+use iced_anim::AnimationBuilder;
 use indexmap::IndexMap;
+
+use crate::config::CONFIG;
 
 type FnvIndexMap<K, V> = IndexMap<K, V, FnvBuildHasher>;
 
@@ -30,44 +30,7 @@ pub enum Message {
     WorkspaceChanged,
 }
 
-// fn hyprland_listen() -> impl iced::futures::Stream<Item = Message> {
-//     use hyprland::{async_closure, data::Workspaces, event_listener::AsyncEventListener};
-//     let test = Arc::new(1);
-//     let t = test.clone();
-//
-//     channel(1, |mut output| async move {
-//         let arc_output = Arc::new(Mutex::new(output));
-//
-//         let mut hyprland_ev_listener = AsyncEventListener::new();
-//         let t = t.clone();
-//         hyprland_ev_listener.add_workspace_changed_handler({
-//             use std::future::IntoFuture;
-//             move |_data| {
-//
-//                 Box::pin(async move {
-//                     {
-//                         println!("TEST");
-//                     }
-//                 })
-//             }
-//         });
-//
-//         hyprland_ev_listener.add_window_moved_handler(async_closure! {
-//             |data| println!("Window moved: {data:?}")
-//         });
-//
-//         if let Err(e) = hyprland_ev_listener.start_listener_async().await {
-//             eprintln!("{e}")
-//         }
-//
-//         // let _ = output
-//         //     .send(Message::WorkspaceChange(
-//         //         "1".to_string(),
-//         //         WorkspaceState::Occupied,
-//         //     ))
-//         //     .await;
-//     })
-// }
+// fn hyprland_listen() -> impl iced::futures::Stream<Item = Message> {}
 
 impl Hyprland {
     pub fn new(workspaces: &Vec<String>) -> Self {
@@ -129,20 +92,71 @@ impl Hyprland {
     }
 
     pub fn view(&self) -> Element<Message> {
-        let wps: Vec<&str> = self
+        let wp_icons: Vec<Element<Message>> = self
             .workspaces
             .values()
-            .map(|wp_state| match wp_state {
-                WorkspaceState::Inactive => "i",
-                WorkspaceState::Active => "a",
-                WorkspaceState::Occupied => "o",
+            .map(|wp_state| {
+                let size = CONFIG.bar.icon_size;
+
+                let width: f32;
+                let height: f32;
+                let color: Color;
+                match wp_state {
+                    WorkspaceState::Active => {
+                        width = size * 4.8;
+                        height = size * 2.8;
+                        color = color!(0xbb9af7);
+                    }
+                    WorkspaceState::Occupied => {
+                        width = size * 1.5;
+                        height = size * 1.5;
+                        color = color!(0xa9b1d6);
+                    }
+                    _ => {
+                        width = size;
+                        height = size;
+                        color = color!(0x565f89);
+                    }
+                };
+
+                // AnimationBuilder::new((width, height), |(w, h)| {
+                //     container("")
+                //         .style(move |theme: &Theme| container::Style {
+                //             border: Border {
+                //                 width: 0.0,
+                //                 radius: 50.0.into(),
+                //                 ..Default::default()
+                //             },
+                //             background: Some(theme.extended_palette().secondary.weak.color.into()),
+                //             ..Default::default()
+                //         })
+                //         .center_x(w)
+                //         .center_y(h)
+                //         .into()
+                // })
+                // .animates_layout(true)
+                // .into()
+
+                container("")
+                    .style(move |_theme: &Theme| container::Style {
+                        border: Border {
+                            width: 0.0,
+                            radius: 50.0.into(),
+                            ..Default::default()
+                        },
+                        background: Some(color.into()),
+                        ..Default::default()
+                    })
+                    .center_x(width)
+                    .center_y(height)
+                    .into()
             })
             .collect();
 
-        let text = text(wps.join(" ")).color(color!(0xffffff));
-
-        // row![text].align_y(Vertical::Center).into()
-        text.into()
+        row(wp_icons)
+            .align_y(Vertical::Center)
+            .spacing(CONFIG.bar.gap)
+            .into()
     }
 
     // ------------------------- Hyprland methods -------------------------

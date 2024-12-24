@@ -9,6 +9,10 @@ pub struct BarConf {
     #[serde(default = "default_anchor", deserialize_with = "parse_anchor")]
     pub anchor: Anchor,
     pub workspaces: Vec<String>,
+    #[serde(default = "default_icon_size")]
+    pub icon_size: f32,
+    #[serde(default = "default_gap")]
+    pub gap: f32,
 }
 
 fn parse_padding<'de, D>(deserializer: D) -> Result<Padding, D::Error>
@@ -52,4 +56,12 @@ where
     }
 
     Ok(Anchor::from_name(&anchor).expect("Invalid anchor point {anchor}"))
+}
+
+fn default_icon_size() -> f32 {
+    6.0
+}
+
+fn default_gap() -> f32 {
+    10.0
 }

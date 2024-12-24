@@ -8,7 +8,7 @@ use modules::hyprland::{self, Hyprland};
 
 use crate::config;
 
-mod modules;
+pub mod modules;
 
 #[derive(Default)]
 pub struct Bar {
