@@ -8,11 +8,8 @@ pub struct BarConf {
     pub padding: Padding,
     #[serde(default = "default_anchor", deserialize_with = "parse_anchor")]
     pub anchor: Anchor,
+    pub workspaces: Vec<String>,
 }
-
-// (Top, Right, Bottom, Left)
-// #[derive(Deserialize, Debug, PartialEq, Default)]
-// pub struct Padding(u8, u8, u8, u8);
 
 fn parse_padding<'de, D>(deserializer: D) -> Result<Padding, D::Error>
 where

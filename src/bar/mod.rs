@@ -1,12 +1,12 @@
-use std::default;
-
 use iced::alignment::{Horizontal, Vertical};
 use iced::widget::{container, row, Container};
-use iced::{Color, Element, Length, Padding, Subscription, Task as Command, Theme};
+use iced::{Color, Element, Length, Padding, Task as Command, Theme};
 use iced_layershell::to_layer_message;
 use iced_layershell::Application;
 use modules::clock::{self, Clock};
 use modules::hyprland::{self, Hyprland};
+
+use crate::config;
 
 mod modules;
 
@@ -40,9 +40,11 @@ impl Application for Bar {
     type Executor = iced::executor::Default;
 
     fn new(_flags: ()) -> (Self, Command<Message>) {
+        let cfg = &config::CONFIG;
+
         (
             Self {
-                start: Hyprland::new(),
+                start: Hyprland::new(&cfg.bar.workspaces),
                 ..Default::default()
             },
             Command::none(),

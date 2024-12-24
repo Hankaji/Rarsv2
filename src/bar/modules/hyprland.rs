@@ -70,11 +70,10 @@ pub enum Message {
 // }
 
 impl Hyprland {
-    pub fn new() -> Self {
-        // TODO: Move hashmap initialization to default() fn
+    pub fn new(workspaces: &Vec<String>) -> Self {
         let mut hm = FnvIndexMap::with_capacity_and_hasher(10, FnvBuildHasher::default());
-        for i in 1..=10 {
-            hm.insert(i.to_string(), WorkspaceState::Inactive);
+        for wp_name in workspaces {
+            hm.insert(wp_name.clone(), WorkspaceState::Inactive);
         }
 
         let mut s = Self { workspaces: hm };
@@ -153,14 +152,10 @@ impl Hyprland {
             })
             .collect();
 
-        let btn: Button<Message> = button("Change").on_press(Message::WorkspaceChange(
-            "1".to_string(),
-            WorkspaceState::Active,
-        ));
-
         let text = text(wps.join(" ")).color(color!(0xffffff));
 
-        row![text, btn].align_y(Vertical::Center).into()
+        // row![text].align_y(Vertical::Center).into()
+        text.into()
     }
 
     // ------------------------- Hyprland methods -------------------------
