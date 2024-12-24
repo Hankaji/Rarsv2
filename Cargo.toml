@@ -10,3 +10,7 @@ iced = { version = "0.13.1", features = ["advanced", "tokio"] }
 iced_layershell = "0.13.0"
 indexmap = "2.7.0"
 hyprland = { git = "https://github.com/hyprland-community/hyprland-rs", branch = "master" }
+json5 = "0.4.1"
+serde_derive = "1.0.216"
+serde = "1.0.216"
+lazy_static = "1.5.0"

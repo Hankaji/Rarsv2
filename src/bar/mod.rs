@@ -99,7 +99,9 @@ impl Application for Bar {
 
         row![left, center, right]
             .width(Length::Fill)
+            .height(Length::Fill)
             .padding(Padding::from([0, 10]))
+            .align_y(Vertical::Center)
             .into()
     }
 

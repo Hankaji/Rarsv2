@@ -1,0 +1,6 @@
+{
+  bar: {
+    padding: 10,
+    anchor: "Bottom"
+  }
+}
