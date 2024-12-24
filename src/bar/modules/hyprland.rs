@@ -10,9 +10,10 @@ use iced::{
     color,
     futures::SinkExt,
     stream::channel,
-    widget::{container, row},
+    widget::{checkbox, container, row},
     Border, Color, Element, Subscription, Theme,
 };
+use iced_anim::AnimationBuilder;
 use indexmap::IndexMap;
 
 use crate::config::CONFIG;
@@ -118,37 +119,23 @@ impl Hyprland {
                     }
                 };
 
-                // AnimationBuilder::new((width, height), |(w, h)| {
-                //     container("")
-                //         .style(move |theme: &Theme| container::Style {
-                //             border: Border {
-                //                 width: 0.0,
-                //                 radius: 50.0.into(),
-                //                 ..Default::default()
-                //             },
-                //             background: Some(theme.extended_palette().secondary.weak.color.into()),
-                //             ..Default::default()
-                //         })
-                //         .center_x(w)
-                //         .center_y(h)
-                //         .into()
-                // })
-                // .animates_layout(true)
-                // .into()
-
-                container("")
-                    .style(move |_theme: &Theme| container::Style {
-                        border: Border {
-                            width: 0.0,
-                            radius: 50.0.into(),
+                AnimationBuilder::new((width, height, color), |(w, h, color)| {
+                    container("")
+                        .style(move |_: &Theme| container::Style {
+                            border: Border {
+                                width: 0.0,
+                                radius: 50.0.into(),
+                                ..Default::default()
+                            },
+                            background: Some(color.into()),
                             ..Default::default()
-                        },
-                        background: Some(color.into()),
-                        ..Default::default()
-                    })
-                    .center_x(width)
-                    .center_y(height)
-                    .into()
+                        })
+                        .center_x(w)
+                        .center_y(h)
+                        .into()
+                })
+                .animates_layout(true)
+                .into()
             })
             .collect();
 
@@ -185,7 +172,7 @@ impl Hyprland {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum WorkspaceState {
     Inactive,
     Active,
