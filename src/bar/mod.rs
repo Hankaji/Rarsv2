@@ -1,6 +1,6 @@
 use iced::alignment::{Horizontal, Vertical};
 use iced::widget::row;
-use iced::{Length, Padding, Task as Command};
+use iced::{Length, Padding, Subscription, Task as Command};
 use iced_layershell::to_layer_message;
 use iced_layershell::Application;
 use modules::clock::{self, Clock};
@@ -60,8 +60,11 @@ impl Application for Bar {
     fn subscription(&self) -> iced::Subscription<Self::Message> {
         // event::listen().map(Message::IcedEvent)
         // self.center.subscription().map(Message::Clock)
-        self.start.subscription().map(Message::Hyprland)
         // Subscription::batch(subscriptions)
+        Subscription::batch(vec![
+            self.start.subscription().map(Message::Hyprland),
+            self.center.subscription().map(Message::Clock),
+        ])
     }
 
     fn update(&mut self, msg: Message) -> Command<Message> {
