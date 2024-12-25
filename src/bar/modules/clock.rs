@@ -1,5 +1,7 @@
 use chrono::{DateTime as DT, Local};
-use iced::{time, widget::text, Element, Subscription};
+use iced::{time, Subscription};
+
+use crate::widgets::{Element, Text};
 
 #[derive(Default)]
 pub struct Clock {
@@ -23,6 +25,6 @@ impl Clock {
     }
 
     pub fn view(&self) -> Element<Message> {
-        text(self.time_now.format("%A, %b %d %H:%M").to_string()).into()
+        Text::new(self.time_now.format("%A, %b %d %H:%M").to_string()).into()
     }
 }

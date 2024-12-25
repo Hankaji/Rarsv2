@@ -1,5 +1,9 @@
 use std::sync::Arc;
 
+use crate::{
+    themes::Theme,
+    widgets::{Container, Element},
+};
 use fnv::FnvBuildHasher;
 use hyprland::{
     data::{Workspace, Workspaces},
@@ -10,8 +14,8 @@ use iced::{
     color,
     futures::SinkExt,
     stream::channel,
-    widget::{checkbox, container, row},
-    Border, Color, Element, Subscription, Theme,
+    widget::{container, row},
+    Border, Color, Subscription,
 };
 use iced_anim::AnimationBuilder;
 use indexmap::IndexMap;
@@ -120,7 +124,7 @@ impl Hyprland {
                 };
 
                 AnimationBuilder::new((width, height, color), |(w, h, color)| {
-                    container("")
+                    Container::new("")
                         .style(move |_: &Theme| container::Style {
                             border: Border {
                                 width: 0.0,

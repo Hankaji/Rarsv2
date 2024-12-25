@@ -1,12 +1,14 @@
 use iced::alignment::{Horizontal, Vertical};
-use iced::widget::{container, row, Container};
-use iced::{Color, Element, Length, Padding, Task as Command, Theme};
+use iced::widget::row;
+use iced::{Length, Padding, Task as Command};
 use iced_layershell::to_layer_message;
 use iced_layershell::Application;
 use modules::clock::{self, Clock};
 use modules::hyprland::{self, Hyprland};
 
 use crate::config;
+use crate::themes::Theme;
+use crate::widgets::{Container, Element};
 
 pub mod modules;
 
@@ -81,38 +83,30 @@ impl Application for Bar {
         let clock_module = self.center.view().map(Message::Clock);
 
         // ------------------------- Container -------------------------
-        let left: Container<Message> = container(row![hyprland_module])
+        let start: Container<Message> = Container::new(row![hyprland_module])
             .width(Length::Fill)
             .height(Length::Shrink)
             .align_left(Length::Fill)
             .align_y(Vertical::Center);
 
-        let center: Container<Message> = container(row![clock_module])
+        let center: Container<Message> = Container::new(row![clock_module])
             .width(Length::Fill)
             .height(Length::Shrink)
             .align_x(Horizontal::Center)
             .align_y(Vertical::Center);
 
-        let right: Container<Message> = container("Right")
+        let end: Container<Message> = Container::new("Right")
             .width(Length::Fill)
             .height(Length::Shrink)
             .align_right(Length::Fill)
             .align_y(Vertical::Center);
 
-        row![left, center, right]
+        row![start, center, end]
             .width(Length::Fill)
             .height(Length::Fill)
             .padding(Padding::from([0, 10]))
             .align_y(Vertical::Center)
             .into()
-    }
-
-    fn style(&self, theme: &Self::Theme) -> iced_layershell::Appearance {
-        use iced_layershell::Appearance;
-        Appearance {
-            background_color: Color::TRANSPARENT,
-            text_color: theme.palette().text,
-        }
     }
 }
 

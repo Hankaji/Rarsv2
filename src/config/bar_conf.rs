@@ -3,7 +3,7 @@ use iced_layershell::reexport::Anchor;
 use serde::{Deserialize, Deserializer};
 
 #[derive(Deserialize, Debug, PartialEq)]
-pub struct BarConf {
+pub struct BarSettings {
     #[serde(default, deserialize_with = "parse_padding")]
     pub padding: Padding,
     #[serde(default = "default_anchor", deserialize_with = "parse_anchor")]

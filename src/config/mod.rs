@@ -1,10 +1,12 @@
 use std::fs;
 
-use bar_conf::BarConf;
+use bar_conf::BarSettings;
 use lazy_static::lazy_static;
 use serde_derive::Deserialize;
+use theme::ThemeSettings;
 
 pub mod bar_conf;
+pub mod theme;
 mod utils;
 
 lazy_static! {
@@ -13,7 +15,8 @@ lazy_static! {
 
 #[derive(Deserialize, Debug, PartialEq)]
 pub struct Config {
-    pub bar: BarConf,
+    pub theme: ThemeSettings,
+    pub bar: BarSettings,
 }
 
 impl Config {
@@ -41,6 +44,7 @@ impl Config {
         };
         // println!("Rars config: {:?}", json5::from_str::<Config>(&config_file).unwrap());
 
+        // TODO: Implement a more friendly error reporting upon failure
         json5::from_str::<Config>(&config_file).expect("Cant parse configuration file")
     }
 }

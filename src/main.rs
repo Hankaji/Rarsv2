@@ -5,6 +5,8 @@ use iced_layershell::Application;
 
 mod bar;
 mod config;
+mod themes;
+mod widgets;
 
 // fn main() -> iced::Result {
 fn main() -> Result<(), iced_layershell::Error> {
