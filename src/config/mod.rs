@@ -2,8 +2,10 @@ use std::fs;
 
 use bar_conf::BarSettings;
 use lazy_static::lazy_static;
-use serde_derive::Deserialize;
+use miette::{Diagnostic, NamedSource, SourceSpan};
+use serde::Deserialize;
 use theme::ThemeSettings;
+use thiserror::Error;
 
 pub mod bar_conf;
 pub mod theme;
@@ -13,6 +15,20 @@ lazy_static! {
     pub static ref CONFIG: Config = Config::init(None);
 }
 
+#[derive(Error, Debug, Diagnostic)]
+#[error("Configuration parse failed!")]
+// #[diagnostic(code(oops::my::bad), url(docsrs))]
+struct ConfigError {
+    // The Source that we're gonna be printing snippets out of.
+    // This can be a String if you don't have or care about file names.
+    #[source_code]
+    src: NamedSource<String>,
+    // Snippets and highlights can be included in the diagnostic!
+    #[label("{msg}")]
+    span: SourceSpan,
+    msg: String,
+}
+
 #[derive(Deserialize, Debug, PartialEq)]
 pub struct Config {
     pub theme: ThemeSettings,
@@ -20,8 +36,7 @@ pub struct Config {
 }
 
 impl Config {
-    const DEFAULT_CONF_DIR: [&str; 2] =
-        ["config/rars.json5", "/home/hankaji/.config/rars/rars.json5"];
+    const DEFAULT_CONF_DIR: [&str; 2] = ["config/rars.ron", "/home/hankaji/.config/rars/rars.ron"];
 
     fn init(path: Option<&str>) -> Self {
         let config_dirs: Vec<&str> = match path {
@@ -42,9 +57,31 @@ impl Config {
         let Some(config_file) = config_file else {
             panic!("Can't find the config file in specified path \"{config_dirs:?}\"");
         };
-        // println!("Rars config: {:?}", json5::from_str::<Config>(&config_file).unwrap());
 
         // TODO: Implement a more friendly error reporting upon failure
-        json5::from_str::<Config>(&config_file).expect("Cant parse configuration file")
+        match ron::from_str(&config_file) {
+            Ok(cfg) => cfg,
+            Err(e) => {
+                let (line, col) = (e.position.line, e.position.col);
+
+                let lines: Vec<&str> = config_file.split('\n').collect();
+                let offset_start: usize = lines[..line - 1] // Take all lines before the target line
+                    .iter()
+                    .map(|l| l.len() + 1) // Add 1 for the newline character
+                    .sum();
+
+                let start = offset_start + col;
+
+                let err = ConfigError {
+                    src: NamedSource::new("rars.ron", config_file.clone()),
+                    span: (start - 2, 1).into(),
+                    msg: match e.code {
+                        ron::Error::Message(msg) => msg,
+                        _ => format!("{:?}", e.code),
+                    },
+                };
+                panic!("{:?}", miette::Report::new(err));
+            }
+        }
     }
 }
