@@ -7,7 +7,8 @@
             )
         )
     ),
-    bar: ( padding: 10,
+    bar: ( 
+        padding: 10,
         anchor: "Top",
         workspaces: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
     )

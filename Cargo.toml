@@ -11,8 +11,9 @@ iced_layershell = { git = "https://github.com/waycrate/exwlshelleventloop.git", 
 # iced_layershell = "0.13.0"
 indexmap = "2.7.0"
 hyprland = { git = "https://github.com/hyprland-community/hyprland-rs", branch = "master" }
-json5 = "0.4.1"
-serde_derive = "1.0.216"
-serde = "1.0.216"
+serde = { version = "1.0.216", features = ["derive"] }
 lazy_static = "1.5.0"
 iced_anim = "0.1.4"
+ron = "0.8.1"
+miette = { version = "7.4.0", features = ["fancy"] }
+thiserror = "2.0.9"
