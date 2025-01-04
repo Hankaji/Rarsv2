@@ -1,0 +1,9 @@
+[package]
+name = "notification"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+zbus = { version = "5.2.0", features = ["tokio"] }
+lazy_static = { workspace = true }
+tokio = { workspace = true }

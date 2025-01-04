@@ -12,8 +12,17 @@ iced_layershell = { git = "https://github.com/waycrate/exwlshelleventloop.git", 
 indexmap = "2.7.0"
 hyprland = { git = "https://github.com/hyprland-community/hyprland-rs", branch = "master" }
 serde = { version = "1.0.216", features = ["derive"] }
-lazy_static = "1.5.0"
 iced_anim = "0.1.4"
+lazy_static = { workspace = true }
 ron = "0.8.1"
 miette = { version = "7.4.0", features = ["fancy"] }
 thiserror = "2.0.9"
+notification = { path = "services/notification" }
+tokio = { workspace = true }
+
+[workspace.dependencies]
+lazy_static = "1.5.0"
+tokio = { version = "1.42.0", features = ["full"] }
+
+[workspace]
+members = ["rars_config_utils", "services/notification"]

@@ -2,6 +2,7 @@ use bar::Bar;
 use iced_layershell::reexport::{Anchor, Layer};
 use iced_layershell::settings::{LayerShellSettings, Settings, StartMode};
 use iced_layershell::Application;
+use notification::Service;
 
 mod bar;
 mod config;
@@ -12,8 +13,9 @@ mod widgets;
 fn main() -> Result<(), iced_layershell::Error> {
     let args: Vec<String> = std::env::args().collect();
 
-    // Init config
+    // Initialize
     let cfg = &config::CONFIG;
+    Service::new();
 
     // Start layershell
     let mut binded_output_name = None;
