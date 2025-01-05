@@ -19,6 +19,7 @@ miette = { version = "7.4.0", features = ["fancy"] }
 thiserror = "2.0.9"
 notification = { path = "services/notification" }
 tokio = { workspace = true }
+file-guard = "0.2.0"
 
 [workspace.dependencies]
 lazy_static = "1.5.0"

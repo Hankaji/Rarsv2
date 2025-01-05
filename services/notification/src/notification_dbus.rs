@@ -60,8 +60,9 @@ impl NotificationDaemon {
     }
 
     fn get_server_information(&mut self) -> zbus::fdo::Result<(String, String, String, String)> {
-        let name = String::from("Notification Daemon Test");
-        let vendor = String::from(env!("CARGO_PKG_NAME"));
+        let name = String::from("Rars Notification");
+        // let vendor = String::from(env!("CARGO_PKG_NAME"));
+        let vendor = String::from("Rars");
         let version = String::from(env!("CARGO_PKG_VERSION"));
         let specification_version = String::from("1.2");
 

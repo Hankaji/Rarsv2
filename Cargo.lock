@@ -1159,6 +1159,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "file-guard"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "21ef72acf95ec3d7dbf61275be556299490a245f017cf084bd23b4f68cf9407c"
+dependencies = [
+ "libc",
+ "winapi",
+]
+
+[[package]]
 name = "flate2"
 version = "1.0.35"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2944,6 +2954,7 @@ name = "rarsv2"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "file-guard",
  "fnv",
  "hyprland",
  "iced",
