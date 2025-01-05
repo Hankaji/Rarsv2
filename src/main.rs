@@ -1,17 +1,27 @@
+use std::fs;
+use std::process::exit;
+
 use bar::Bar;
+use clap::Parser;
+use cli::{Cli, Commands};
 use file_guard::FileGuard;
 use iced_layershell::reexport::{Anchor, Layer};
 use iced_layershell::settings::{LayerShellSettings, Settings, StartMode};
 use iced_layershell::Application;
+use nix::libc::{kill, SIGTERM};
+use nix::sys::signal::Signal;
+use nix::unistd::Pid;
 use notification::Service;
 
 mod bar;
+mod cli;
 mod config;
 mod themes;
 mod widgets;
 
 fn main() -> Result<(), iced_layershell::Error> {
     let args: Vec<String> = std::env::args().collect();
+    let _ = Cli::parse();
 
     check_instance();
 
@@ -57,7 +67,7 @@ fn check_instance() {
     use std::io::prelude::*;
     use std::sync::LazyLock;
 
-    static INSTANCE: LazyLock<FileGuard<Box<File>>> = LazyLock::new(|| {
+    pub(crate) static INSTANCE: LazyLock<Option<FileGuard<Box<File>>>> = LazyLock::new(|| {
         const PID_DIR: &str = "/tmp/rarsv2.pid";
         let pid = std::process::id();
 
@@ -74,12 +84,47 @@ fn check_instance() {
         // Attempt to obtain the lock file 'rarsv2.pid'
         // Fail if another instance is already running
         let flock = file_guard::try_lock(file, file_guard::Lock::Exclusive, 0, 1);
+        let cli = Cli::parse();
         match flock {
-            Ok(mut flock) => {
-                write!(flock, "{pid}").unwrap();
-                flock
+            Ok(mut flock) => match cli.command {
+                None => {
+                    write!(flock, "{pid}").expect("Could not write to pid file");
+                    Some(flock)
+                }
+                Some(cmd) => match cmd {
+                    Commands::Quit => {
+                        panic!("No available instance to terminate")
+                    }
+                    _ => None,
+                },
+            },
+            Err(_) => {
+                let running_pid = fs::read_to_string(PID_DIR).expect("Could not read pid file");
+                let Ok(running_pid): Result<u32, _> = running_pid.parse() else {
+                    panic!("PID {running_pid} can't be parsed to u8")
+                };
+
+                match cli.command {
+                    None => {
+                        panic!("Another instance with proccess id {running_pid} is already running")
+                    }
+                    Some(cmd) => match cmd {
+                        Commands::Quit => {
+                            match nix::sys::signal::kill(
+                                Pid::from_raw(running_pid as i32),
+                                Signal::SIGTERM,
+                            ) {
+                                Ok(_) => {
+                                    println!("Proccess {} terminated successfully", running_pid)
+                                }
+                                Err(e) => eprintln!("Failed to terminate proccess {}", e),
+                            }
+                            exit(0)
+                        }
+                        _ => None,
+                    },
+                }
             }
-            Err(_) => panic!("Another instance with proccess id {pid} is already running"),
         }
     });
 
