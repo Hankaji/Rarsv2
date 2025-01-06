@@ -2,6 +2,7 @@
 name = "battery"
 version = "0.1.0"
 edition = "2021"
+description = "A battery service listening Upower DBus"
 
 [dependencies]
 zbus = { version = "5.2.0", features = ["tokio"] }
