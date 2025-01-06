@@ -8,24 +8,31 @@ chrono = "0.4.39"
 fnv = "1.0.7"
 iced = { version = "0.13.1", features = ["advanced", "tokio"] }
 iced_layershell = { git = "https://github.com/waycrate/exwlshelleventloop.git", branch = "master" }
-# iced_layershell = "0.13.0"
 indexmap = "2.7.0"
 hyprland = { git = "https://github.com/hyprland-community/hyprland-rs", branch = "master" }
-serde = { version = "1.0.216", features = ["derive"] }
 iced_anim = "0.1.4"
-lazy_static = { workspace = true }
 ron = "0.8.1"
 miette = { version = "7.4.0", features = ["fancy"] }
 thiserror = "2.0.9"
 notification = { path = "services/notification" }
-tokio = { workspace = true }
 file-guard = "0.2.0"
 clap = { version = "4.5.23", features = ["derive"] }
 nix = { version = "0.29.0", features = ["signal"] }
+lazy_static = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+futures = { workspace = true }
 
 [workspace.dependencies]
 lazy_static = "1.5.0"
 tokio = { version = "1.42.0", features = ["full"] }
+serde = { version = "1.0.216", features = ["derive"] }
+futures = "0.3.31"
 
 [workspace]
-members = ["rars_config_utils", "services/notification"]
+members = [
+  "rars_config_utils",
+  "services/battery",
+  "services/notification",
+  "services/battery",
+]
