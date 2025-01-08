@@ -8,7 +8,6 @@ use file_guard::FileGuard;
 use iced_layershell::reexport::{Anchor, Layer};
 use iced_layershell::settings::{LayerShellSettings, Settings, StartMode};
 use iced_layershell::Application;
-use nix::libc::{kill, SIGTERM};
 use nix::sys::signal::Signal;
 use nix::unistd::Pid;
 use notification::Service;
