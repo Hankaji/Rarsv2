@@ -3070,6 +3070,7 @@ version = "0.1.0"
 name = "rarsv2"
 version = "0.1.0"
 dependencies = [
+ "battery",
  "chrono",
  "clap",
  "file-guard",

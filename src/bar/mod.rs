@@ -3,6 +3,7 @@ use iced::widget::row;
 use iced::{Length, Padding, Subscription, Task as Command};
 use iced_layershell::to_layer_message;
 use iced_layershell::Application;
+use modules::battery::{self, Battery};
 use modules::clock::{self, Clock};
 use modules::hyprland::{self, Hyprland};
 
@@ -16,6 +17,7 @@ pub mod modules;
 pub struct Bar {
     start: Hyprland,
     center: Clock,
+    end: Battery,
     // test: [BarModules],
 }
 
@@ -33,6 +35,7 @@ pub struct Bar {
 pub enum Message {
     Clock(clock::Message),
     Hyprland(hyprland::Message),
+    Battery(battery::Message),
 }
 
 impl Application for Bar {
@@ -64,6 +67,7 @@ impl Application for Bar {
         Subscription::batch(vec![
             self.start.subscription().map(Message::Hyprland),
             self.center.subscription().map(Message::Clock),
+            self.end.subscription().map(Message::Battery),
         ])
     }
 
@@ -77,6 +81,10 @@ impl Application for Bar {
                 self.start.update(msg);
                 Command::none()
             }
+            Message::Battery(msg) => {
+                self.end.update(msg);
+                Command::none()
+            }
             _ => unimplemented!(),
         }
     }
@@ -84,6 +92,7 @@ impl Application for Bar {
     fn view(&self) -> Element<Message> {
         let hyprland_module = self.start.view().map(Message::Hyprland);
         let clock_module = self.center.view().map(Message::Clock);
+        let bat_module = self.end.view().map(Message::Battery);
 
         // ------------------------- Container -------------------------
         let start: Container<Message> = Container::new(row![hyprland_module])
@@ -98,7 +107,7 @@ impl Application for Bar {
             .align_x(Horizontal::Center)
             .align_y(Vertical::Center);
 
-        let end: Container<Message> = Container::new("Right")
+        let end: Container<Message> = Container::new(row![bat_module])
             .width(Length::Fill)
             .height(Length::Shrink)
             .align_right(Length::Fill)
@@ -117,4 +126,5 @@ impl Application for Bar {
 enum BarModules {
     Clock,
     Hyprland,
+    Battery,
 }
